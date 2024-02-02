@@ -13,8 +13,10 @@ AMapManager::AMapManager()
 	direction = FVector::BackwardVector;
 	speed = 10.f; 
 	playerDamagedSpeed = 0.5f;
+	mapSpeedBuff = 1.f;
 	speedBuff = 1.f;
 	totalSpeed = 0.f;
+	nextMapTypeTime = 30.f;
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +26,9 @@ void AMapManager::BeginPlay()
 
 	nextMapType = EMapType::MT_Normal;
 	nextMapLoopType = EMapLoopType::MLT_Loop;
+
+	FTimerHandle timerHandle;
+	GetWorldTimerManager().SetTimer(timerHandle, this, &AMapManager::SetNextMapType, nextMapTypeTime, true);
 
 	if (allMapList.Num() > 0)
 	{
@@ -94,7 +99,7 @@ void AMapManager::Tick(float DeltaTime)
 			return;
 
 		FVector location = moveActorList[i].parent->GetActorLocation();
-		totalSpeed = speed * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
+		totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
 		location += direction * totalSpeed;
 
 		moveActorList[i].parent->SetActorLocation(location);
@@ -117,9 +122,6 @@ void AMapManager::AddSwitchMapType(AMapController* map)
 	case EMapType::MT_Snow:
 		temp = &snowMapList;
 		break;
-	case EMapType::MT_Ice:
-		temp = &iceMapList;
-		break;
 	default:
 		temp = nullptr;
 		break;
@@ -134,9 +136,6 @@ void AMapManager::AddSwitchMapType(AMapController* map)
 			break;
 		case EMapLoopType::MLT_Loop:
 			temp->loop.Add(map);
-			break;
-		case EMapLoopType::MLT_End:
-			temp->end.Add(map);
 			break;
 		default:
 			break;
@@ -170,6 +169,12 @@ void AMapManager::SetPlayerDamaged(bool isDamaged)
 	isPlayerDamaged = isDamaged;
 }
 
+void AMapManager::SetNextMapType()
+{
+	nextMapType = EMapType(((int)nextMapType + 1) % (int)EMapType::MT_Num);
+	//nextMapLoopType = EMapLoopType::MLT_Start;
+}
+
 AMapController* AMapManager::GetMap(EMapType mapType, EMapLoopType mapLoopType)
 {
 	FMapWaitingList* temp;
@@ -181,9 +186,6 @@ AMapController* AMapManager::GetMap(EMapType mapType, EMapLoopType mapLoopType)
 		break;
 	case EMapType::MT_Snow:
 		temp = &snowMapList;
-		break;
-	case EMapType::MT_Ice:
-		temp = &iceMapList;
 		break;
 	default:
 		temp = nullptr;
@@ -201,10 +203,6 @@ AMapController* AMapManager::GetMap(EMapType mapType, EMapLoopType mapLoopType)
 			break;
 		case EMapLoopType::MLT_Loop:
 			temp2 = &temp->loop;
-			break;
-		case EMapLoopType::MLT_End:
-			temp2 = &temp->end;
-			nextMapLoopType = EMapLoopType::MLT_Start;
 			break;
 		default:
 			break;

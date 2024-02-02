@@ -20,9 +20,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<AMapController*> loop;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<AMapController*> end;
 };
 
 USTRUCT(BlueprintType)
@@ -51,7 +48,7 @@ class RUNGAME_API AMapManager : public AActor
 	FMapWaitingList snowMapList;
 
 	UPROPERTY(VisibleAnywhere)
-	FMapWaitingList iceMapList;
+	FMapWaitingList upStairMapList;
 
 	UPROPERTY()
 	bool isPlayerDamaged;
@@ -64,6 +61,7 @@ public:
 	UPROPERTY(VisibleAnyWhere)
 	EMapLoopType nextMapLoopType;
 
+	// move Info
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "MoveInfo")
 	FVector direction;
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "MoveInfo")
@@ -71,11 +69,22 @@ public:
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "MoveInfo")
 	float playerDamagedSpeed;
 	UPROPERTY(VisibleAnywhere, blueprintReadOnly, Category = "MoveInfo")
+	float mapSpeedBuff;
+	UPROPERTY(VisibleAnywhere, blueprintReadOnly, Category = "MoveInfo")
 	float speedBuff;
 
 	UPROPERTY(VisibleAnywhere, blueprintReadOnly, Category = "MoveInfo")
 	float totalSpeed;
 
+
+
+	// map Info
+	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "MapInfo")
+	float nextMapTypeTime;
+
+
+
+	// map List
 	UPROPERTY(EditAnywhere, Category = "MapList")
 	FMoveMap moveActorList[3];
 
@@ -99,6 +108,7 @@ public:
 	void AddSpeedBuff(float buff);
 	void RemoveSpeedBuff(float buff);
 	void SetPlayerDamaged(bool isDamaged);
+	void SetNextMapType();
 
 	UFUNCTION()
 	AMapController* GetMap(EMapType mapType, EMapLoopType mapLoopType);

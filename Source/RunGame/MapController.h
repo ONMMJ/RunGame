@@ -13,7 +13,7 @@ enum class EMapType : uint8
 {
 	MT_Normal UMETA(DisplayName = "Normal"),
 	MT_Snow UMETA(DisplayName = "Snow"),
-	MT_Ice UMETA(DisplayName = "Ice"),
+	MT_Num UMETA(DisplayName = "Num"),
 };
 
 UENUM(BlueprintType)
@@ -21,7 +21,6 @@ enum class EMapLoopType : uint8
 {
 	MLT_Start UMETA(DisplayName = "Start"),
 	MLT_Loop UMETA(DisplayName = "Loop"),
-	MLT_End UMETA(DisplayName = "End"),
 };
 
 UCLASS()

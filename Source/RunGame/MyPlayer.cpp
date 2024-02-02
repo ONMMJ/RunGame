@@ -285,7 +285,8 @@ float AMyPlayer::GetNextExp()
 
 void AMyPlayer::SetMapSpeedBuff(float speedBuff)
 {
-	mapSpeedBuff = speedBuff;
+	mapManager->mapSpeedBuff = speedBuff;
+
 }
 
 void AMyPlayer::AddSpeed(float add)

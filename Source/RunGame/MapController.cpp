@@ -21,8 +21,8 @@ AMapController::AMapController()
 
 	startBoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	if (startBoxComponent) {
-		startBoxComponent->SetWorldLocation(FVector(-3533.5, 1420., 124.));
-		startBoxComponent->SetWorldScale3D(FVector(2., 15.5, 3.));
+		startBoxComponent->SetWorldLocation(FVector(-3533.5, 1420., 319.));
+		startBoxComponent->SetWorldScale3D(FVector(2., 15.5, 10.));
 		startBoxComponent->SetCollisionProfileName(TEXT("OverlapAll"));
 		startBoxComponent->SetupAttachment(mesh);
 	}
