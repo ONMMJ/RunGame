@@ -94,6 +94,9 @@ public:
 	UPROPERTY(EditAnywhere, blueprintReadOnly, Category = "MapList")
 	TArray<TSubclassOf<AMapController>> allMapList;
 
+	// map Effect
+	UPROPERTY(EditAnywhere, Category = "MapList")
+	TArray<AActor*> snowEffectList;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

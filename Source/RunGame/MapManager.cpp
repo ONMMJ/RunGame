@@ -51,6 +51,7 @@ void AMapManager::BeginPlay()
 	{
 		if (!IsValid(moveActorList[i].parent))
 			return;
+
 		AMapController* map = GetMap(nextMapType, nextMapLoopType);
 		if (IsValid(map))
 		{
@@ -172,7 +173,17 @@ void AMapManager::SetPlayerDamaged(bool isDamaged)
 void AMapManager::SetNextMapType()
 {
 	nextMapType = EMapType(((int)nextMapType + 1) % (int)EMapType::MT_Num);
-	//nextMapLoopType = EMapLoopType::MLT_Start;
+	nextMapLoopType = EMapLoopType::MLT_Start;
+	switch (nextMapType)
+	{
+	case EMapType::MT_Normal:
+		break;
+	case EMapType::MT_Snow:
+		break;
+	default:
+		break;
+	}
+	//SetActorHiddenInGame(!isActive);
 }
 
 AMapController* AMapManager::GetMap(EMapType mapType, EMapLoopType mapLoopType)
