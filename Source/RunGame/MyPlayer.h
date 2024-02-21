@@ -51,8 +51,8 @@ class RUNGAME_API AMyPlayer : public ACharacter
 	double moveNegative;
 	UPROPERTY()
 	float speed;
-
-
+	UPROPERTY()
+	float bonusExp;
 public:
 	// Sets default values for this character's properties
 	AMyPlayer();
@@ -133,7 +133,12 @@ public:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void SetMapSpeedBuff(float speedBuff);
-	void AddSpeed(float add);
 	void GetDamaged(float damage);
 	void DamagedNext();
+
+	// LevelUp Option
+	void AddBonusExp(float value);
+	void SetSpeed(float value);
+	void SubHpDownBuff(float value);
+	void AddMaxHp(float value);
 };

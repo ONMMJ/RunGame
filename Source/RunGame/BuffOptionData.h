@@ -6,24 +6,28 @@
 #include "Engine/DataAsset.h"
 #include "BuffOptionData.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FOptionInfo {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere)
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString id;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString title;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     UTexture2D* image;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FString optionText;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 persentCount;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float value;
 };
 
 UCLASS()
@@ -36,6 +40,7 @@ class RUNGAME_API UBuffOptionData : public UDataAsset
         TArray<FOptionInfo> optionList;
 
     public:
+        UFUNCTION(BlueprintCallable)
         TArray<FOptionInfo> RandomPickupOption(int num);
     private:
         int SumPersentCount();

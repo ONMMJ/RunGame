@@ -12,13 +12,18 @@ class RUNGAME_API ALineSpawner : public AActor
 	GENERATED_BODY()
 	
 	UPROPERTY()
-	FVector moveVector;
+	int YMoveDirection;
 	UPROPERTY()
-	int moveDirection;
+	float nowYMoveTurnTime;
 	UPROPERTY()
-	float nowMoveTurnTime;
+	float nextYMoveTurnTime;
+
+
+	int ZMoveDirection;
 	UPROPERTY()
-	float nextMoveTurnTime;
+	float nowZMoveTurnTime;
+	UPROPERTY()
+	float nextZMoveTurnTime;
 	UPROPERTY()
 	FTimerHandle timerHandle;
 public:	
@@ -46,9 +51,13 @@ public:
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
 	bool isTurn;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
-	float moveTurnMinTime;
+	float YMoveTurnMinTime;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
-	float moveTurnMaxTime;
+	float YMoveTurnMaxTime;
+	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
+	float ZMoveTurnMinTime;
+	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
+	float ZMoveTurnMaxTime;
 
 
 protected:

@@ -20,7 +20,7 @@ void AActorMovingOnFloor::BeginPlay()
 	TArray<FHitResult> hits;
 	FVector start = GetActorLocation();
 	FVector direction = GetActorUpVector() * -1;
-	FVector end = start + direction * 100.f;
+	FVector end = start + direction * 500.f;
 
 	bool gotHits = GetWorld()->LineTraceMultiByChannel(hits, start, end, ECC_Visibility);
 	if (gotHits)
@@ -30,12 +30,17 @@ void AActorMovingOnFloor::BeginPlay()
 			FHitResult hit = hits[i];
 			if (hit.GetActor())
 			{
+				UE_LOG(LogTemp, Error, TEXT("%s"), *hit.GetActor()->GetName());
 				AMapController* map = Cast<AMapController>(hit.GetActor());
 				if (IsValid(map))
 				{
 					AttachToActor(map, FAttachmentTransformRules::KeepWorldTransform);
 					break;
 				}
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("no map"));
 			}
 		}
 	}

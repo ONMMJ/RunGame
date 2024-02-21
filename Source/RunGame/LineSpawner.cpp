@@ -15,8 +15,8 @@ ALineSpawner::ALineSpawner()
 	// linkOption
 	linkMoveSpeed = 3.f;
 	isTurn = true;
-	moveTurnMinTime = 3.f;
-	moveTurnMaxTime = 10.f;
+	YMoveTurnMinTime = 3.f;
+	YMoveTurnMaxTime = 10.f;
 }
 
 // Called when the game starts or when spawned
@@ -25,11 +25,13 @@ void ALineSpawner::BeginPlay()
 	Super::BeginPlay();
 	if (isLinked)
 	{
-		nowMoveTurnTime = 0.f;
-		nextMoveTurnTime = FMath::RandRange(moveTurnMinTime, moveTurnMaxTime);
-		moveVector = end->GetActorLocation() - start->GetActorLocation();
-		moveVector.Normalize();
-		moveDirection = 1;
+		nowYMoveTurnTime = 0.f;
+		nextYMoveTurnTime = FMath::RandRange(YMoveTurnMinTime, YMoveTurnMaxTime);
+		nowZMoveTurnTime = 0.f;
+		nextZMoveTurnTime = FMath::RandRange(ZMoveTurnMinTime, ZMoveTurnMaxTime);
+		YMoveDirection = 1;
+		ZMoveDirection = 0;
+
 
 		GetWorldTimerManager().SetTimer(timerHandle, this, &ALineSpawner::LinkedSpawn, spawnTime, true);
 	}
@@ -43,26 +45,54 @@ void ALineSpawner::Tick(float DeltaTime)
 {
 	if (isLinked)
 	{
-		nowMoveTurnTime += DeltaTime;
-		if (nowMoveTurnTime >= nextMoveTurnTime)
+		nowYMoveTurnTime += DeltaTime;
+		nowZMoveTurnTime += DeltaTime;
+		if (nowYMoveTurnTime >= nextYMoveTurnTime)
 		{
-			if (moveDirection == 0)
+			if (YMoveDirection == 0)
 			{
-				moveDirection = FMath::RandRange(0, 1) ? -1 : 1;
-				nextMoveTurnTime = FMath::RandRange(moveTurnMinTime, moveTurnMaxTime);
+				YMoveDirection = FMath::RandRange(0, 1) ? -1 : 1;
+				nextYMoveTurnTime = FMath::RandRange(YMoveTurnMinTime, YMoveTurnMaxTime);
 			}
 			else
 			{
-				moveDirection = 0;
-				nextMoveTurnTime = 1.f;
+				YMoveDirection = 0;
+				nextYMoveTurnTime = 1.f;
 			}
-			nowMoveTurnTime = 0.f;
+			nowYMoveTurnTime = 0.f;
 		}
-		move->SetActorLocation(move->GetActorLocation() + (moveVector * moveDirection * linkMoveSpeed));
 		if (move->GetActorLocation().Y <= start->GetActorLocation().Y)
-			moveDirection *= -1;
+			YMoveDirection *= -1;
 		else if (move->GetActorLocation().Y >= end->GetActorLocation().Y)
-			moveDirection *= -1;
+			YMoveDirection *= -1;
+
+		if (move->GetActorLocation().Z <= start->GetActorLocation().Z)
+		{
+			if (FMath::RandRange(0, 1)) 
+			{
+				ZMoveDirection = 0;
+			}
+			else
+			{
+				ZMoveDirection *= -1;
+			}
+		}
+		else if (move->GetActorLocation().Z >= end->GetActorLocation().Z)
+			ZMoveDirection *= -1;
+
+		if (nowZMoveTurnTime >= nextZMoveTurnTime)
+		{
+			if (ZMoveDirection == 0)
+			{
+				ZMoveDirection = 1;
+				nextZMoveTurnTime = FMath::RandRange(ZMoveTurnMinTime, ZMoveTurnMaxTime);
+			}
+			nowZMoveTurnTime = 0.f;
+
+		}
+
+		//UE_LOG(LogTemp, Warning, TEXT("%d ,%f"), ZMoveDirection, nextZMoveTurnTime);
+		move->SetActorLocation(move->GetActorLocation() + (FVector::RightVector * YMoveDirection * linkMoveSpeed) + (FVector::UpVector * ZMoveDirection * linkMoveSpeed));
 	}
 }
 

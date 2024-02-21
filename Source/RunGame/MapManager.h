@@ -56,6 +56,9 @@ public:
 	// Sets default values for this actor's properties
 	AMapManager();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class AMyPlayer* player;
+
 	UPROPERTY(VisibleAnyWhere)
 	EMapType nextMapType;
 	UPROPERTY(VisibleAnyWhere)
@@ -95,6 +98,8 @@ public:
 	TArray<TSubclassOf<AMapController>> allMapList;
 
 	// map Effect
+	UPROPERTY(VisibleAnywhere, Category = "MapList")
+	TArray<AActor*> allEffectList;
 	UPROPERTY(EditAnywhere, Category = "MapList")
 	TArray<AActor*> snowEffectList;
 protected:
@@ -105,12 +110,21 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void AddEffectList(TArray<AActor*> addList);
+	void allOffMapEffect();
+	void setMapEffect(EMapType mapType);
+	void onMapEffect(TArray<AActor*> effectList);
 	void AddSwitchMapType(AMapController* map);
+
+	// speed
 	void SetSpeed(float speed);
 	void AddSpeed(float add);
 	void AddSpeedBuff(float buff);
+	void SetMapSpeedBuff(float buff);
 	void RemoveSpeedBuff(float buff);
 	void SetPlayerDamaged(bool isDamaged);
+	void SetPlayerSpeed();
+
 	void SetNextMapType();
 
 	UFUNCTION()

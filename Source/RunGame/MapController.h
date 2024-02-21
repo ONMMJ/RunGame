@@ -37,6 +37,9 @@ public:
 	// Sets default values for this actor's properties
 	AMapController();
 
+	// MapManager
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MapInfo")
+	class AMapManager* mapManager;
 	// MapInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MapInfo")
 	EMapType mapType;

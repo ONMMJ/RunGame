@@ -13,7 +13,6 @@ class UButton;
 class UWidget;
 class UImage;
 
-
 UCLASS()
 class RUNGAME_API UWidget_OptionButton : public UUserWidget
 {
@@ -21,6 +20,7 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 
 		UPROPERTY()
 		APlayerController* PlayerController;
+
 
 	public:
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -30,49 +30,34 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		class AMapManager* mapManager;
 
-		UPROPERTY(EditAnywhere, Category = "DataAsset")
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DataAsset")
 		class UBuffOptionData* buffOptionData;
 
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UWidget* optionButtonListPanel;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TArray<UWidget*> optionButtonPanel;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TArray<UButton*> optionButtonList;
-
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TArray<UTextBlock*> optionTitleList;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TArray<UImage*> optionImageList;
-		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TArray<UTextBlock*> optionTextList;
 
 	protected:
 		virtual void NativeOnInitialized();
 
 		/** Buff Option Func **/
-		void SetOption(TArray<FOptionInfo> optionList);
-		void SelectOption(UButton* button, FString id);
-		UFUNCTION()
+
+		UFUNCTION(BlueprintCallable)
 		void StartGame();
-		UFUNCTION()
+		UFUNCTION(BlueprintCallable)
 		void StopGame();
-		UFUNCTION()
-		void Option_MaxHpUp();
-		UFUNCTION()
-		void Option_HpDownSlowly();
-		UFUNCTION()
-		void Option_SpeedUp();
-		UFUNCTION()
-		void Option_GrowUp();
-		UFUNCTION()
-		void Option_AddShield();
+		UFUNCTION(BlueprintCallable)
+		void Option_MaxHpUp(float value);
+		UFUNCTION(BlueprintCallable)
+		void Option_HpDownSlowly(float value);
+		UFUNCTION(BlueprintCallable)
+		void Option_SpeedUp(float value);
+		UFUNCTION(BlueprintCallable)
+		void Option_GrowUp(float value);
+		UFUNCTION(BlueprintCallable)
+		void Option_AddShield(float value);
 	private:
 
 	public:
-		UFUNCTION()
-		void SetOptionUI();
-
-		UFUNCTION()
-		void SetButtonUI(FOptionInfo optionInfo, int index);
+		UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+		void SetOptionUI(int optionCount);
 };

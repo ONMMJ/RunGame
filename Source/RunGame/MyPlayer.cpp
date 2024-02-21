@@ -40,6 +40,7 @@ AMyPlayer::AMyPlayer()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+	JumpMaxCount = 2;
 
 	// 위아래로 이동하지 않을 때 정면을 바라보는 시간
 	rotationTime = 0.5f;
@@ -126,13 +127,13 @@ void AMyPlayer::Tick(float DeltaTime)
 			// 현재 lerp에 들어갈 알파 값 = 현재 시간 / 회전에 걸리는 시간
 			float t = currentRotationTime / rotationTime;
 			FRotator angle = GetActorRotation();
-			FRotator moveDirection = FRotator::ZeroRotator;
+			FRotator YMoveDirection = FRotator::ZeroRotator;
 
 			if (!isMoveFront)
-				moveDirection.Yaw = moveDirection.Yaw + (30. * moveNegative);
+				YMoveDirection.Yaw = YMoveDirection.Yaw + (30. * moveNegative);
 
 			// 월드기준 앞방향으로 t초에 걸쳐 회전
-			angle = FMath::Lerp<FRotator>(angle, moveDirection, t);
+			angle = FMath::Lerp<FRotator>(angle, YMoveDirection, t);
 			SetActorRotation(angle);
 		}
 	}
@@ -177,9 +178,10 @@ void AMyPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 		}
 		if (!isDamaged)
 		{
-			if (OtherActor->ActorHasTag(TEXT("Enemy")))
+			FString str = TEXT("Enemy");
+			if (OtherComp->GetCollisionProfileName().ToString() == str)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), OtherActor->ActorHasTag(TEXT("Enemy")) ? TEXT("true") : TEXT("false"));
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherComp->GetCollisionProfileName().ToString());
 				GetDamaged(10.f);
 			}
 		}
@@ -224,6 +226,7 @@ void AMyPlayer::Init()
 	expUpPerSecond = 1.f;
 	runningDistance = 0.f;
 	level = 1;
+	bonusExp = 0.f;
 	nowExp = 0.f;
 	nextExp = 30.f;
 	damagedTime = 3.f;
@@ -263,6 +266,7 @@ void AMyPlayer::GameStart()
 void AMyPlayer::GetExp(float exp)
 {
 	nowExp += exp;
+	nowExp += bonusExp;
 	while (nowExp >= nextExp) {
 		nowExp -= nextExp;
 		LevelUp();
@@ -273,7 +277,8 @@ void AMyPlayer::GetExp(float exp)
 void AMyPlayer::LevelUp()
 {
 	level++;
-	optionButtonWidget->SetOptionUI();
+	isMoveFront = true;
+	optionButtonWidget->SetOptionUI(buffOptionCount);
 }
 
 
@@ -285,16 +290,30 @@ float AMyPlayer::GetNextExp()
 
 void AMyPlayer::SetMapSpeedBuff(float speedBuff)
 {
-	mapManager->mapSpeedBuff = speedBuff;
-
+	mapManager->SetMapSpeedBuff(speedBuff);
 }
 
-void AMyPlayer::AddSpeed(float add)
+void AMyPlayer::AddBonusExp(float value)
 {
-	speed += add;
-	if (speed > 600.f)
-		speed = 600.f;
+	bonusExp += value;
+}
+
+void AMyPlayer::SetSpeed(float value)
+{
+	speed = value;
 	GetCharacterMovement()->MaxWalkSpeed = speed;
+}
+
+void AMyPlayer::SubHpDownBuff(float value)
+{
+	float result = value / 100.f;
+	hpDownBuff -= result;
+}
+
+void AMyPlayer::AddMaxHp(float value)
+{
+	maxHp += value;
+	hp += value;
 }
 
 void AMyPlayer::GetDamaged(float damage)

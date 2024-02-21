@@ -3,12 +3,15 @@
 
 #include "MapManager.h"
 #include "MapController.h"
+#include "MyPlayer.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMapManager::AMapManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 
 	direction = FVector::BackwardVector;
 	speed = 10.f; 
@@ -23,6 +26,9 @@ AMapManager::AMapManager()
 void AMapManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Get Player
+	player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	nextMapType = EMapType::MT_Normal;
 	nextMapLoopType = EMapLoopType::MLT_Loop;
@@ -43,6 +49,7 @@ void AMapManager::BeginPlay()
 			if (IsValid(map))
 			{
 				AddSwitchMapType(map);
+				map->mapManager = this;
 			}
 		}
 	}
@@ -62,7 +69,14 @@ void AMapManager::BeginPlay()
 		}
 
 	}
+	
+	// init mapEffectList
+	AddEffectList(snowEffectList);
+
+	allOffMapEffect();
 }
+
+
 
 // Called every frame
 void AMapManager::Tick(float DeltaTime)
@@ -94,16 +108,68 @@ void AMapManager::Tick(float DeltaTime)
 		}
 	}
 
+	totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
+
 	for (int i = 0; i < 3; i++)
 	{
 		if (!IsValid(moveActorList[i].parent))
 			return;
 
 		FVector location = moveActorList[i].parent->GetActorLocation();
-		totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
-		location += direction * totalSpeed;
+		location += direction * totalSpeed * 100.f * DeltaTime;
 
 		moveActorList[i].parent->SetActorLocation(location);
+	}
+}
+
+void AMapManager::AddEffectList(TArray<AActor*> addList)
+{
+	if (addList.Num() > 0)
+	{
+		for (AActor* temp : addList)
+		{
+			allEffectList.Add(temp);
+		}
+	}
+}
+
+void AMapManager::allOffMapEffect()
+{
+	if (allEffectList.Num() > 0)
+	{
+		for (AActor* temp : allEffectList)
+		{
+			temp->SetActorHiddenInGame(true);
+		}
+	}
+}
+
+void AMapManager::setMapEffect(EMapType mapType)
+{
+	allOffMapEffect();
+
+	switch (mapType)
+	{
+	case EMapType::MT_Normal:
+		break;
+	case EMapType::MT_Snow:
+		onMapEffect(snowEffectList);
+		break;
+	case EMapType::MT_Num:
+		break;
+	default:
+		break;
+	}
+}
+
+void AMapManager::onMapEffect(TArray<AActor*> effectList)
+{
+	if (effectList.Num() > 0)
+	{
+		for (AActor* temp : effectList)
+		{
+			temp->SetActorHiddenInGame(false);
+		}
 	}
 }
 
@@ -148,26 +214,44 @@ void AMapManager::AddSwitchMapType(AMapController* map)
 void AMapManager::SetSpeed(float inputSpeed)
 {
 	speed = inputSpeed;
+	SetPlayerSpeed();
 }
 
 void AMapManager::AddSpeed(float add)
 {
 	speed += add;
+	SetPlayerSpeed();
 }
 
 void AMapManager::AddSpeedBuff(float buff)
 {
 	speedBuff *= buff;
+	SetPlayerSpeed();
+}
+
+void AMapManager::SetMapSpeedBuff(float buff)
+{
+	mapSpeedBuff = buff;
+	SetPlayerSpeed();
 }
 
 void AMapManager::RemoveSpeedBuff(float buff)
 {
-	speedBuff /= buff;
+	speedBuff /= buff; 
+	SetPlayerSpeed();
 }
 
 void AMapManager::SetPlayerDamaged(bool isDamaged)
 {
 	isPlayerDamaged = isDamaged;
+	SetPlayerSpeed();
+}
+
+void AMapManager::SetPlayerSpeed()
+{
+	totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
+	float playerSpeed = totalSpeed * 40.f;
+	player->SetSpeed(playerSpeed);
 }
 
 void AMapManager::SetNextMapType()

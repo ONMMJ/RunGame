@@ -4,6 +4,7 @@
 #include "MapController.h"
 #include "ExpObject.h"
 #include "MyPlayer.h"
+#include "MapManager.h"
 #include <Components/BoxComponent.h>
 
 // Sets default values
@@ -42,6 +43,11 @@ void AMapController::OnOverlapBeginPlayer(UPrimitiveComponent* OverlappedCompone
 	if (player)
 	{
 		player->SetMapSpeedBuff(speedBuff);
+
+		if (mapLoopType == EMapLoopType::MLT_Start)
+		{
+			mapManager->setMapEffect(mapType);
+		}
 	}
 }
 
