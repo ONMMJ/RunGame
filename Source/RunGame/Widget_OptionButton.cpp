@@ -17,6 +17,8 @@ void UWidget_OptionButton::NativeOnInitialized()
 
 	player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
+	SetOptionList();
+
 	// Get MapManager
 	TArray<AActor*> arrOutActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMapManager::StaticClass(), arrOutActors);
@@ -31,7 +33,92 @@ void UWidget_OptionButton::NativeOnInitialized()
 	optionButtonListPanel->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+void UWidget_OptionButton::SetOptionList()
+{
+	optionArray = buffOptionData->GetOptionList();
+	for (int i = 0; i < optionArray.Num(); i++)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *optionArray[i].id);
+		UE_LOG(LogTemp, Warning, TEXT("%d"), optionArray[i].level);
+		FOptionInfo* optionInfo = &optionArray[i];
+		optionList.Add(optionArray[i].id, optionInfo);
+		UE_LOG(LogTemp, Warning, TEXT("%d"), optionInfo->level);
+	} 
+}
 
+TArray<FString> UWidget_OptionButton::RandomPickupOption(int num)
+{
+	int maxPerCount = SumPersentCount();
+	TArray<FOptionInfo> tempList = GetRemainOption();
+	TArray<FString> result;
+	for (int i = 0; i < num; i++)
+	{
+		int sumPerCount = 0;
+		int perCount = FMath::RandRange(1, maxPerCount);
+		UE_LOG(LogTemp, Warning, TEXT("%d, %d, %d"), optionList.Num(), tempList.Num(), SumPersentCount());
+		if (tempList.Num() > 0) {
+			for (int j = 0; j<tempList.Num();j++)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s ,%d, %d"), *tempList[j].id, perCount, maxPerCount);
+				if (tempList[j].level < tempList[j].maxLevel)
+					sumPerCount += tempList[j].persentCount;
+				else
+				{
+					continue;
+				}
+				// 확률카운트 합이 랜덤값 이하이면
+				if (perCount <= sumPerCount)
+				{
+					result.Add(tempList[j].id);
+					maxPerCount -= tempList[j].persentCount;
+					tempList.RemoveAt(j);
+					break;
+				}
+			}
+		}
+		else
+		{
+			result.Add(TEXT("None"));
+		}
+	}
+	int index = FMath::RandRange(0, 4);
+	return result;
+}
+
+void UWidget_OptionButton::AddOptionLevel(FString optionId)
+{
+	optionList[optionId]->level++;
+}
+FOptionInfo UWidget_OptionButton::GetOptionInfo(FString optionId)
+{
+	return *optionList[optionId];
+}
+int UWidget_OptionButton::SumPersentCount()
+{
+	int sum = 0;
+	int a = optionList[TEXT("MaxHpUp")]->level;
+	UE_LOG(LogTemp, Warning, TEXT("%d"), optionArray[0].level);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), a);
+	for (auto var : optionList)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("dddddd"));
+		UE_LOG(LogTemp, Warning, TEXT("%d, %d"), var.Value->level, var.Value->maxLevel);
+		if (var.Value->level < var.Value->maxLevel)
+			sum += var.Value->persentCount;
+	}
+	return sum;
+}
+TArray<FOptionInfo> UWidget_OptionButton::GetRemainOption()
+{
+	TMap<FString, FOptionInfo*> tempList = optionList;
+	TArray<FOptionInfo> result;
+	for (auto var : tempList)
+	{
+		if (var.Value->level < var.Value->maxLevel)
+			result.Add(*var.Value);
+	}
+	return result;
+}
 //===================================================================================
 #pragma region BuffOptionList
 

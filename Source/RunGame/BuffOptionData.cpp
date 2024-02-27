@@ -4,11 +4,21 @@
 #include "BuffOptionData.h"
 #include "Containers/Array.h"
 
-TArray<FOptionInfo> UBuffOptionData::RandomPickupOption(int num)
+TArray<FOptionInfo> UBuffOptionData::GetOptionList()
+{
+	// ±Ì¿∫∫πªÁ
+	TArray<FOptionInfo> infoList = static_cast<TArray<FOptionInfo>>(optionList);
+	return infoList;
+}
+
+/*TArray<FOptionInfo> UBuffOptionData::RandomPickupOption(int num)
 {
 	int maxPerCount = SumPersentCount();
 	// ±Ì¿∫∫πªÁ
-	TArray<FOptionInfo> infoList = static_cast<TArray<FOptionInfo>>(optionList);
+	//TArray<FOptionInfo> infoList = static_cast<TArray<FOptionInfo>>(optionList);
+	
+	// æË¿∫∫πªÁ
+	TArray<FOptionInfo> infoList = optionList;
 	TArray<FOptionInfo> result;
 	FOptionInfo temp;
 	for (int i = 0; i < num; i++) 
@@ -18,7 +28,10 @@ TArray<FOptionInfo> UBuffOptionData::RandomPickupOption(int num)
 		UE_LOG(LogTemp, Warning, TEXT("%d, %d, %d"), infoList.Num(), maxPerCount,perCount);
 		for (int j = 0; j<infoList.Num(); j++)
 		{
-			sumPerCount += infoList[j].persentCount;
+			if (infoList[j].level < infoList[j].maxLevel)
+				sumPerCount += infoList[j].persentCount;
+			else
+				continue;
 			// »Æ∑¸ƒ´øÓ∆Æ «’¿Ã ∑£¥˝∞™ ¿Ã«œ¿Ã∏È
 			if (perCount <= sumPerCount)
 			{
@@ -31,14 +44,15 @@ TArray<FOptionInfo> UBuffOptionData::RandomPickupOption(int num)
 	}
 	int index = FMath::RandRange(0, 4);
 	return result;
-}
+}*/
 
-int UBuffOptionData::SumPersentCount()
+/*int UBuffOptionData::SumPersentCount()
 {
 	int sum = 0;
 	for (FOptionInfo var : optionList)
 	{
-		sum += var.persentCount;
+		if (var.level < var.maxLevel)
+			sum += var.persentCount;
 	}
 	return sum;
-}
+}*/

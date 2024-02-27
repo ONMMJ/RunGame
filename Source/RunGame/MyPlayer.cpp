@@ -260,7 +260,7 @@ void AMyPlayer::GameStart()
 	expUpBuff = 1.f;
 	expObjectBuff = 1.f;
 
-	buffOptionCount = 3;
+	//buffOptionCount = 3;
 }
 
 void AMyPlayer::GetExp(float exp)

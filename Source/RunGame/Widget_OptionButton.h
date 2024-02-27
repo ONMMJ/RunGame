@@ -6,7 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Widget_OptionButton.generated.h"
 
-
 struct FOptionInfo;
 class UTextBlock;
 class UButton;
@@ -33,6 +32,11 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DataAsset")
 		class UBuffOptionData* buffOptionData;
 
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataAsset")
+		TArray<FOptionInfo> optionArray;
+
+		TMap<FString, FOptionInfo*> optionList;
+
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UWidget* optionButtonListPanel;
 
@@ -57,7 +61,17 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		void Option_AddShield(float value);
 	private:
 
+		void SetOptionList();
+		int SumPersentCount();
+		TArray<FOptionInfo> GetRemainOption();
 	public:
 		UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void SetOptionUI(int optionCount);
+
+		UFUNCTION(BlueprintCallable)
+		TArray<FString> RandomPickupOption(int num);
+		UFUNCTION(BlueprintCallable)
+		void AddOptionLevel(FString optionId);
+		UFUNCTION(BlueprintCallable)
+		FOptionInfo GetOptionInfo(FString optionId);
 };

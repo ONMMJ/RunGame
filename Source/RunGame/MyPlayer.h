@@ -105,7 +105,7 @@ public:
 	float expObjectBuff;
 
 	// BuffOption
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "BuffOption")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BuffOption")
 	int buffOptionCount;
 
 protected:
