@@ -18,6 +18,7 @@ void UWidget_OptionButton::NativeOnInitialized()
 	player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	SetOptionList();
+	levelUpPoint = 0;
 
 	// Get MapManager
 	TArray<AActor*> arrOutActors;
@@ -35,16 +36,15 @@ void UWidget_OptionButton::NativeOnInitialized()
 
 void UWidget_OptionButton::SetOptionList()
 {
+	// DataAsset의 Option정보를 TMap(optionList)에 저장
 	optionArray = buffOptionData->GetOptionList();
 	for (int i = 0; i < optionArray.Num(); i++)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *optionArray[i].id);
-		UE_LOG(LogTemp, Warning, TEXT("%d"), optionArray[i].level);
 		FOptionInfo* optionInfo = &optionArray[i];
 		optionList.Add(optionArray[i].id, optionInfo);
-		UE_LOG(LogTemp, Warning, TEXT("%d"), optionInfo->level);
-	} 
+	}
 }
+
 
 TArray<FString> UWidget_OptionButton::RandomPickupOption(int num)
 {
@@ -122,10 +122,27 @@ TArray<FOptionInfo> UWidget_OptionButton::GetRemainOption()
 //===================================================================================
 #pragma region BuffOptionList
 
+void UWidget_OptionButton::PlayerLevelUp()
+{
+	levelUpPoint++;
+	if (levelUpPoint > 1)
+		return;
+	SetOptionUI(player->buffOptionCount);
+}
+void UWidget_OptionButton::InvokeOptionFunc(FString optionId)
+{
+	//optionFuncMap[optionId](this);
+}
 void UWidget_OptionButton::StartGame()
 {
 	optionButtonListPanel->SetVisibility(ESlateVisibility::Collapsed);
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
+
+	levelUpPoint--;
+	if (levelUpPoint > 0)
+	{
+		SetOptionUI(player->buffOptionCount);
+	}
 
 	if (!ensure(PlayerController != nullptr)) return;
 	//마우스커서 안 보이게하기
@@ -142,6 +159,12 @@ void UWidget_OptionButton::StopGame()
 	//마우스커서 보이게하기
 	PlayerController->bShowMouseCursor = true;
 }
+
+//void UWidget_OptionButton::SetOptionFuncMap()
+//{
+//	// Option을 실행할 함수를 TMap에 저장
+//	optionFuncMap.Add(TEXT("MaxHpUp"), &UWidget_OptionButton::Option_MaxHpUp)
+//}
 
 void UWidget_OptionButton::Option_MaxHpUp(float value)
 {

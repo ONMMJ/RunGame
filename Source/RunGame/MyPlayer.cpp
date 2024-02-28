@@ -130,7 +130,17 @@ void AMyPlayer::Tick(float DeltaTime)
 			FRotator YMoveDirection = FRotator::ZeroRotator;
 
 			if (!isMoveFront)
-				YMoveDirection.Yaw = YMoveDirection.Yaw + (30. * moveNegative);
+			{
+				float turnAngle;
+				if (speed > 599.f)
+					turnAngle = 30.f;
+				else if (speed > 20.f)
+					turnAngle = speed / 600.f * 30.f;
+				else
+					turnAngle = 10.f;
+
+				YMoveDirection.Yaw = YMoveDirection.Yaw + (turnAngle * moveNegative);
+			}
 
 			// 월드기준 앞방향으로 t초에 걸쳐 회전
 			angle = FMath::Lerp<FRotator>(angle, YMoveDirection, t);
@@ -278,7 +288,7 @@ void AMyPlayer::LevelUp()
 {
 	level++;
 	isMoveFront = true;
-	optionButtonWidget->SetOptionUI(buffOptionCount);
+	optionButtonWidget->PlayerLevelUp();
 }
 
 

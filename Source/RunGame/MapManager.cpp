@@ -250,7 +250,7 @@ void AMapManager::SetPlayerDamaged(bool isDamaged)
 void AMapManager::SetPlayerSpeed()
 {
 	totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
-	float playerSpeed = totalSpeed * 40.f;
+	float playerSpeed = totalSpeed * 50.f;
 	player->SetSpeed(playerSpeed);
 }
 

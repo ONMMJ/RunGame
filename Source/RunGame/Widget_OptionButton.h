@@ -20,7 +20,8 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		UPROPERTY()
 		APlayerController* PlayerController;
 
-
+		//UPROPERTY()
+		//TMap<FString, TFunction<void(UWidget_OptionButton*)>> optionFuncMap;
 	public:
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class AMyPlayer* player;
@@ -37,9 +38,12 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 
 		TMap<FString, FOptionInfo*> optionList;
 
+
 		UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UWidget* optionButtonListPanel;
 
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int levelUpPoint;
 	protected:
 		virtual void NativeOnInitialized();
 
@@ -62,9 +66,11 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 	private:
 
 		void SetOptionList();
+		//void SetOptionFuncMap();
 		int SumPersentCount();
 		TArray<FOptionInfo> GetRemainOption();
 	public:
+		void PlayerLevelUp();
 		UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void SetOptionUI(int optionCount);
 
@@ -74,4 +80,7 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		void AddOptionLevel(FString optionId);
 		UFUNCTION(BlueprintCallable)
 		FOptionInfo GetOptionInfo(FString optionId);
+
+		UFUNCTION(BlueprintCallable)
+		void InvokeOptionFunc(FString optionId);
 };
