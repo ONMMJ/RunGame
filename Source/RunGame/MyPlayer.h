@@ -61,6 +61,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class AMapManager* mapManager;
 
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly)
+	class USphereComponent* magnetCollision;
+
 	UPROPERTY(BluePrintReadOnly)
 	double direction;
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly)
@@ -132,6 +135,9 @@ public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
+	void OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	void SetMapSpeedBuff(float speedBuff);
 	void GetDamaged(float damage);
 	void DamagedNext();
@@ -141,4 +147,5 @@ public:
 	void SetSpeed(float value);
 	void SubHpDownBuff(float value);
 	void AddMaxHp(float value);
+	void SetMagnet(float value);
 };

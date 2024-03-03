@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include <EnhancedInputSubsystems.h>
 #include <EnhancedInputComponent.h>
+#include "Components/SphereComponent.h"
 #include "Widget_OptionButton.h"
 #include "ExpObject.h"
 #include "MapManager.h"
@@ -42,6 +43,12 @@ AMyPlayer::AMyPlayer()
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	JumpMaxCount = 2;
 
+	magnetCollision = CreateDefaultSubobject<USphereComponent>(TEXT("MagnetCollision"));
+	magnetCollision->SetCollisionProfileName(TEXT("Magnet"));
+	magnetCollision->SetupAttachment(GetCapsuleComponent());
+	magnetCollision->SetGenerateOverlapEvents(false);
+	magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
+
 	// 위아래로 이동하지 않을 때 정면을 바라보는 시간
 	rotationTime = 0.5f;
 
@@ -55,7 +62,7 @@ void AMyPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	GameStart();
-	
+
 	// Get MapManager
 	TArray<AActor*> arrOutActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMapManager::StaticClass(), arrOutActors);
@@ -198,6 +205,20 @@ void AMyPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	}
 }
 
+void AMyPlayer::OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("---------------"));
+	if (OtherActor && (OtherActor != this) && OtherComp)
+	{
+		AExpObject* expObject = Cast<AExpObject>(OtherActor);
+		if (IsValid(expObject))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName());
+			expObject->TrackingPlayer(this);
+		}
+	}
+}
+
 void AMyPlayer::StartMove(const FInputActionValue& Value)
 {
 	currentRotationTime = 0.f;
@@ -257,6 +278,7 @@ void AMyPlayer::GameStart()
 	speed = firstSpeed;
 	isMoveFront = true;
 	isMove = true;
+	magnetCollision->SetGenerateOverlapEvents(false);	// 자석 off
 
 	// 기본 세팅
 	hpDownPerSecond = 1.f;
@@ -324,6 +346,14 @@ void AMyPlayer::AddMaxHp(float value)
 {
 	maxHp += value;
 	hp += value;
+}
+
+void AMyPlayer::SetMagnet(float value)
+{
+	magnetCollision->SetGenerateOverlapEvents(true);
+	//magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
+	FVector scale = magnetCollision->GetRelativeScale3D() * (1.f + value / 100.f);
+	magnetCollision->SetRelativeScale3D(scale);
 }
 
 void AMyPlayer::GetDamaged(float damage)

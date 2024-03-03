@@ -18,6 +18,7 @@ void UWidget_OptionButton::NativeOnInitialized()
 	player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	SetOptionList();
+	SetOptionFuncMap();
 	levelUpPoint = 0;
 
 	// Get MapManager
@@ -34,9 +35,9 @@ void UWidget_OptionButton::NativeOnInitialized()
 	optionButtonListPanel->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+// DataAsset의 Option정보를 TMap(optionList)에 저장
 void UWidget_OptionButton::SetOptionList()
 {
-	// DataAsset의 Option정보를 TMap(optionList)에 저장
 	optionArray = buffOptionData->GetOptionList();
 	for (int i = 0; i < optionArray.Num(); i++)
 	{
@@ -45,6 +46,16 @@ void UWidget_OptionButton::SetOptionList()
 	}
 }
 
+// Option을 실행할 함수를 TMap에 저장
+void UWidget_OptionButton::SetOptionFuncMap()
+{
+	optionFuncMap.Add(TEXT("MaxHpUp"), &UWidget_OptionButton::Option_MaxHpUp);
+	optionFuncMap.Add(TEXT("HpDownSlowly"), &UWidget_OptionButton::Option_HpDownSlowly);
+	optionFuncMap.Add(TEXT("SpeedUp"), &UWidget_OptionButton::Option_SpeedUp);
+	optionFuncMap.Add(TEXT("GrowUp"), &UWidget_OptionButton::Option_GrowUp);
+	optionFuncMap.Add(TEXT("AddShield"), &UWidget_OptionButton::Option_AddShield);
+	optionFuncMap.Add(TEXT("SetMagnet"), &UWidget_OptionButton::Option_SetMagnet);
+}
 
 TArray<FString> UWidget_OptionButton::RandomPickupOption(int num)
 {
@@ -84,15 +95,6 @@ TArray<FString> UWidget_OptionButton::RandomPickupOption(int num)
 	int index = FMath::RandRange(0, 4);
 	return result;
 }
-
-void UWidget_OptionButton::AddOptionLevel(FString optionId)
-{
-	optionList[optionId]->level++;
-}
-FOptionInfo UWidget_OptionButton::GetOptionInfo(FString optionId)
-{
-	return *optionList[optionId];
-}
 int UWidget_OptionButton::SumPersentCount()
 {
 	int sum = 0;
@@ -108,6 +110,22 @@ int UWidget_OptionButton::SumPersentCount()
 	}
 	return sum;
 }
+
+//===================================================================================
+#pragma region OptionSetting
+// 옵션 레벨업
+void UWidget_OptionButton::AddOptionLevel(FString optionId)
+{
+	optionList[optionId]->level++;
+}
+
+// 옵션 불러오기
+FOptionInfo UWidget_OptionButton::GetOptionInfo(FString optionId)
+{
+	return *optionList[optionId];
+}
+
+// Max레벨이 아닌 옵션 불러오기
 TArray<FOptionInfo> UWidget_OptionButton::GetRemainOption()
 {
 	TMap<FString, FOptionInfo*> tempList = optionList;
@@ -119,9 +137,10 @@ TArray<FOptionInfo> UWidget_OptionButton::GetRemainOption()
 	}
 	return result;
 }
+#pragma endregion
 //===================================================================================
-#pragma region BuffOptionList
 
+// 플레이어 레벨업 시 실행
 void UWidget_OptionButton::PlayerLevelUp()
 {
 	levelUpPoint++;
@@ -129,10 +148,10 @@ void UWidget_OptionButton::PlayerLevelUp()
 		return;
 	SetOptionUI(player->buffOptionCount);
 }
-void UWidget_OptionButton::InvokeOptionFunc(FString optionId)
-{
-	//optionFuncMap[optionId](this);
-}
+
+//===================================================================================
+#pragma region BuffOptionList
+
 void UWidget_OptionButton::StartGame()
 {
 	optionButtonListPanel->SetVisibility(ESlateVisibility::Collapsed);
@@ -160,11 +179,12 @@ void UWidget_OptionButton::StopGame()
 	PlayerController->bShowMouseCursor = true;
 }
 
-//void UWidget_OptionButton::SetOptionFuncMap()
-//{
-//	// Option을 실행할 함수를 TMap에 저장
-//	optionFuncMap.Add(TEXT("MaxHpUp"), &UWidget_OptionButton::Option_MaxHpUp)
-//}
+void UWidget_OptionButton::ApplyOption(FString optionId)
+{
+	float value = optionList[optionId]->value;
+	optionFuncMap[optionId](this, value);
+	AddOptionLevel(optionId);
+}
 
 void UWidget_OptionButton::Option_MaxHpUp(float value)
 {
@@ -189,6 +209,11 @@ void UWidget_OptionButton::Option_GrowUp(float value)
 void UWidget_OptionButton::Option_AddShield(float value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("AddShield"));
+}
+
+void UWidget_OptionButton::Option_SetMagnet(float value)
+{
+	player->SetMagnet(value);
 }
 
 #pragma endregion

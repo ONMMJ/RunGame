@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -20,8 +18,7 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		UPROPERTY()
 		APlayerController* PlayerController;
 
-		//UPROPERTY()
-		//TMap<FString, TFunction<void(UWidget_OptionButton*)>> optionFuncMap;
+		TMap<FString, TFunction<void(UWidget_OptionButton*, float)>> optionFuncMap;
 	public:
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class AMyPlayer* player;
@@ -54,19 +51,19 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		UFUNCTION(BlueprintCallable)
 		void StopGame();
 		UFUNCTION(BlueprintCallable)
+		void ApplyOption(FString optionId);
+
 		void Option_MaxHpUp(float value);
-		UFUNCTION(BlueprintCallable)
 		void Option_HpDownSlowly(float value);
-		UFUNCTION(BlueprintCallable)
 		void Option_SpeedUp(float value);
-		UFUNCTION(BlueprintCallable)
 		void Option_GrowUp(float value);
-		UFUNCTION(BlueprintCallable)
 		void Option_AddShield(float value);
+		void Option_SetMagnet(float value);
+
 	private:
 
 		void SetOptionList();
-		//void SetOptionFuncMap();
+		void SetOptionFuncMap();
 		int SumPersentCount();
 		TArray<FOptionInfo> GetRemainOption();
 	public:
@@ -80,7 +77,4 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		void AddOptionLevel(FString optionId);
 		UFUNCTION(BlueprintCallable)
 		FOptionInfo GetOptionInfo(FString optionId);
-
-		UFUNCTION(BlueprintCallable)
-		void InvokeOptionFunc(FString optionId);
 };
