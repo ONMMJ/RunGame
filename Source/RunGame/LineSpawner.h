@@ -49,8 +49,6 @@ public:
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
 	float linkMoveSpeed;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
-	bool isTurn;
-	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
 	float YMoveTurnMinTime;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
 	float YMoveTurnMaxTime;
@@ -70,4 +68,7 @@ public:
 
 	void RandomSpawn();
 	void LinkedSpawn();
+
+	void StartSpawn();
+	void PauseSpawn();
 };

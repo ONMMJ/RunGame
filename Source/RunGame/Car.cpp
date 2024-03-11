@@ -2,6 +2,7 @@
 
 
 #include "Car.h"
+#include "MyPlayer.h"
 #include "Components/SkeletalMeshComponent.h"
 #include <Components/BoxComponent.h>
 #include "RoadCollider.h"
@@ -18,13 +19,14 @@ ACar::ACar()
 
 	mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	RootComponent = mesh;
-	mesh->SetCollisionProfileName(TEXT("Car"));
+	mesh->SetCollisionProfileName(TEXT("Enemy"));
 	mesh->SetGenerateOverlapEvents(true);
 
 	frontCarCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("FrontCarCollision"));
 	frontCarCollision->SetupAttachment(mesh);
 	destroyTime = 10.f;
 	moveSpeed = 500.0f;
+	damage = 10.f;
 }
 
 // Called when the game starts or when spawned
@@ -107,6 +109,12 @@ void ACar::OnOverlapBeginRoadCollision(UPrimitiveComponent* OverlappedComponent,
 		trafficLight = trafficLightCollider;
 		CheckTrafficLight();
 	}
+
+	AMyPlayer* player = Cast<AMyPlayer>(OtherActor);
+	if (player)
+	{
+		player->GetDamaged(damage);
+	}
 }
 
 void ACar::OnOverlapBeginFrontCar(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -115,7 +123,6 @@ void ACar::OnOverlapBeginFrontCar(UPrimitiveComponent* OverlappedComponent, AAct
 	ACar* frontCar = Cast<ACar>(OtherActor);
 	if (frontCar)
 		isFrontCar = true;
-	UE_LOG(LogTemp, Warning, TEXT("%s : %d" ), *frontCar->GetName(), frontCar->isFrontCar);
 }
 
 void ACar::OnOverlapEndFrontCar(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

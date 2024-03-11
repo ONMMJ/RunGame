@@ -7,6 +7,7 @@
 #include "MapManager.generated.h"
 
 class AMapController;
+class ALineSpawner;
 
 USTRUCT()
 struct FMapWaitingList
@@ -98,10 +99,18 @@ public:
 	TArray<TSubclassOf<AMapController>> allMapList;
 
 	// map Effect
-	UPROPERTY(VisibleAnywhere, Category = "MapList")
+	UPROPERTY(VisibleAnywhere, Category = "MapEffect")
 	TArray<AActor*> allEffectList;
-	UPROPERTY(EditAnywhere, Category = "MapList")
+	UPROPERTY(EditAnywhere, Category = "MapEffect")
 	TArray<AActor*> snowEffectList;
+
+	// map Spawner
+	UPROPERTY(VisibleAnywhere, Category = "MapSpawner")
+	TArray<ALineSpawner*> allSpawnerList;
+	UPROPERTY(EditAnywhere, Category = "MapSpawner")
+	TArray<ALineSpawner*> normalSpawnerList;
+	UPROPERTY(EditAnywhere, Category = "MapSpawner")
+	TArray<ALineSpawner*> snowSpawnerList;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -110,10 +119,18 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// map Effect
+	void setMapEffect(EMapType mapType);
 	void AddEffectList(TArray<AActor*> addList);
 	void allOffMapEffect();
-	void setMapEffect(EMapType mapType);
 	void onMapEffect(TArray<AActor*> effectList);
+
+	// map Spawner
+	void setMapSpawner(EMapType mapType);
+	void AddSpawnerList(TArray<ALineSpawner*> addList);
+	void allOffMapSpawner();
+	void onMapSpawner(TArray<ALineSpawner*> spawnerList);
+
 	void AddSwitchMapType(AMapController* map);
 
 	// speed

@@ -30,7 +30,7 @@ void AActorMovingOnFloor::BeginPlay()
 			FHitResult hit = hits[i];
 			if (hit.GetActor())
 			{
-				UE_LOG(LogTemp, Error, TEXT("%s"), *hit.GetActor()->GetName());
+				UE_LOG(LogTemp, Error, TEXT("%s, %d"), *hit.GetActor()->GetName(), i);
 				AMapController* map = Cast<AMapController>(hit.GetActor());
 				if (IsValid(map))
 				{

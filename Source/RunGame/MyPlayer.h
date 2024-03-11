@@ -38,6 +38,10 @@ class RUNGAME_API AMyPlayer : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveDownAction;
 
+
+	UPROPERTY()
+	int magnetLevel;
+
 	// Turn Info
 	UPROPERTY()
 	FRotator yawRotation;
@@ -139,6 +143,7 @@ public:
 	void OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void SetMapSpeedBuff(float speedBuff);
+	UFUNCTION(BlueprintCallable)
 	void GetDamaged(float damage);
 	void DamagedNext();
 

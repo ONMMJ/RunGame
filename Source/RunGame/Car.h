@@ -39,6 +39,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = Move)
 	float destroyTime;
 
+	UPROPERTY(EditAnywhere, Category = "Enemy")
+	float damage;
 	//FTransform* frontLeftTire;
 
 protected:

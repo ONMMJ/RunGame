@@ -130,7 +130,7 @@ void AMyPlayer::Tick(float DeltaTime)
 			//UE_LOG(LogTemplateCharacter, Error, TEXT("%f, cur: %f, flag: %s"), GetCharacterMovement()->GetCurrentAcceleration().Y, currentRotationTime, isMoveFront ? TEXT("true") : TEXT("false"));
 			// 현재 회전 시간을 더해준다.
 			currentRotationTime += DeltaTime;
-			UE_LOG(LogTemp, Error, TEXT("%f"), currentRotationTime);
+			//UE_LOG(LogTemp, Error, TEXT("%f"), currentRotationTime);
 			// 현재 lerp에 들어갈 알파 값 = 현재 시간 / 회전에 걸리는 시간
 			float t = currentRotationTime / rotationTime;
 			FRotator angle = GetActorRotation();
@@ -191,29 +191,18 @@ void AMyPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 		if (IsValid(expObject)) 
 		{
 			GetExp(expObject->exp);
-			expObject->SetActive(false);
-		}
-		if (!isDamaged)
-		{
-			FString str = TEXT("Enemy");
-			if (OtherComp->GetCollisionProfileName().ToString() == str)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherComp->GetCollisionProfileName().ToString());
-				GetDamaged(10.f);
-			}
+			expObject->DestorySelf();
 		}
 	}
 }
 
 void AMyPlayer::OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("---------------"));
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
 		AExpObject* expObject = Cast<AExpObject>(OtherActor);
 		if (IsValid(expObject))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName());
 			expObject->TrackingPlayer(this);
 		}
 	}
@@ -251,6 +240,7 @@ void AMyPlayer::EndMove(const FInputActionValue& Value)
 void AMyPlayer::Init() 
 {
 	// Stat
+	magnetLevel = 0;
 	firstSpeed = 400.f;
 	maxHp = 100.f;
 	hpDownPerSecond = 1.f;
@@ -281,6 +271,7 @@ void AMyPlayer::GameStart()
 	magnetCollision->SetGenerateOverlapEvents(false);	// 자석 off
 
 	// 기본 세팅
+	magnetLevel = 0;
 	hpDownPerSecond = 1.f;
 	expUpPerSecond = 1.f;
 	runningDistance = 0.f;
@@ -350,14 +341,25 @@ void AMyPlayer::AddMaxHp(float value)
 
 void AMyPlayer::SetMagnet(float value)
 {
-	magnetCollision->SetGenerateOverlapEvents(true);
-	//magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
-	FVector scale = magnetCollision->GetRelativeScale3D() * (1.f + value / 100.f);
-	magnetCollision->SetRelativeScale3D(scale);
+	if (magnetLevel > 0)
+	{
+		float mulScaleValue = 1.1f;
+		FVector scale = magnetCollision->GetRelativeScale3D() * mulScaleValue;
+		magnetCollision->SetRelativeScale3D(scale);
+	}
+	else 
+	{
+		magnetCollision->SetGenerateOverlapEvents(true);
+		magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
+	}
+	magnetLevel += value;
+	UE_LOG(LogTemp, Warning, TEXT("magnetLevel: %d, addValue: %f"), magnetLevel, value);
 }
 
 void AMyPlayer::GetDamaged(float damage)
 {
+	if (isDamaged)
+		return;
 	hp -= damage;
 	FTimerHandle timeHandle;
 

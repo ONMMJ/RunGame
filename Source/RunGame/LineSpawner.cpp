@@ -14,7 +14,6 @@ ALineSpawner::ALineSpawner()
 
 	// linkOption
 	linkMoveSpeed = 3.f;
-	isTurn = true;
 	YMoveTurnMinTime = 3.f;
 	YMoveTurnMaxTime = 10.f;
 }
@@ -99,7 +98,7 @@ void ALineSpawner::Tick(float DeltaTime)
 void ALineSpawner::RandomSpawn()
 {
 		UWorld* world = GetWorld();
-		FRotator rotator = FRotator::ZeroRotator;
+		FRotator rotator = start->GetActorRotation();
 		FVector spawnLocation;
 		FVector startPos = start->GetActorLocation();
 		FVector endPos = end->GetActorLocation();
@@ -118,4 +117,14 @@ void ALineSpawner::LinkedSpawn()
 		FVector spawnLocation = move->GetActorLocation();
 
 		world->SpawnActor<AActor>(spawnActor, spawnLocation, rotator);
+}
+
+void ALineSpawner::StartSpawn()
+{
+	GetWorldTimerManager().UnPauseTimer(timerHandle);
+}
+
+void ALineSpawner::PauseSpawn()
+{
+	GetWorldTimerManager().PauseTimer(timerHandle);
 }

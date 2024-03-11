@@ -47,6 +47,7 @@ void AMapController::OnOverlapBeginPlayer(UPrimitiveComponent* OverlappedCompone
 		if (mapLoopType == EMapLoopType::MLT_Start)
 		{
 			mapManager->setMapEffect(mapType);
+			mapManager->setMapSpawner(mapType);
 		}
 	}
 }

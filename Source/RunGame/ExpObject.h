@@ -32,6 +32,7 @@ protected:
 
 public:
 	void SetActive(bool isActive);
+	void DestorySelf();
 	void TrackingPlayer(AActor* actor);
 
 	// Called every frame

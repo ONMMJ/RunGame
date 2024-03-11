@@ -4,6 +4,7 @@
 #include "MapManager.h"
 #include "MapController.h"
 #include "MyPlayer.h"
+#include "LineSpawner.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -72,8 +73,12 @@ void AMapManager::BeginPlay()
 	
 	// init mapEffectList
 	AddEffectList(snowEffectList);
-
 	allOffMapEffect();
+
+	// init mapSpawnerList
+	AddSpawnerList(normalSpawnerList);
+	AddSpawnerList(snowSpawnerList);
+	setMapSpawner(nextMapType);
 }
 
 
@@ -121,29 +126,8 @@ void AMapManager::Tick(float DeltaTime)
 		moveActorList[i].parent->SetActorLocation(location);
 	}
 }
-
-void AMapManager::AddEffectList(TArray<AActor*> addList)
-{
-	if (addList.Num() > 0)
-	{
-		for (AActor* temp : addList)
-		{
-			allEffectList.Add(temp);
-		}
-	}
-}
-
-void AMapManager::allOffMapEffect()
-{
-	if (allEffectList.Num() > 0)
-	{
-		for (AActor* temp : allEffectList)
-		{
-			temp->SetActorHiddenInGame(true);
-		}
-	}
-}
-
+//==========================================================================
+#pragma region MapEffect
 void AMapManager::setMapEffect(EMapType mapType)
 {
 	allOffMapEffect();
@@ -161,7 +145,26 @@ void AMapManager::setMapEffect(EMapType mapType)
 		break;
 	}
 }
-
+void AMapManager::AddEffectList(TArray<AActor*> addList)
+{
+	if (addList.Num() > 0)
+	{
+		for (AActor* temp : addList)
+		{
+			allEffectList.Add(temp);
+		}
+	}
+}
+void AMapManager::allOffMapEffect()
+{
+	if (allEffectList.Num() > 0)
+	{
+		for (AActor* temp : allEffectList)
+		{
+			temp->SetActorHiddenInGame(true);
+		}
+	}
+}
 void AMapManager::onMapEffect(TArray<AActor*> effectList)
 {
 	if (effectList.Num() > 0)
@@ -172,7 +175,59 @@ void AMapManager::onMapEffect(TArray<AActor*> effectList)
 		}
 	}
 }
+#pragma endregion
+//==========================================================================
+#pragma region MapSpawner
+void AMapManager::setMapSpawner(EMapType mapType)
+{
+	allOffMapSpawner();
 
+	switch (mapType)
+	{
+	case EMapType::MT_Normal:
+		onMapSpawner(normalSpawnerList);
+		break;
+	case EMapType::MT_Snow:
+		onMapSpawner(snowSpawnerList);
+		break;
+	case EMapType::MT_Num:
+		break;
+	default:
+		break;
+	}
+}
+void AMapManager::AddSpawnerList(TArray<ALineSpawner*> addList)
+{
+	if (addList.Num() > 0)
+	{
+		for (ALineSpawner* temp : addList)
+		{
+			allSpawnerList.Add(temp);
+		}
+	}
+}
+void AMapManager::allOffMapSpawner()
+{
+	if (allSpawnerList.Num() > 0)
+	{
+		for (ALineSpawner* temp : allSpawnerList)
+		{
+			temp->PauseSpawn();
+		}
+	}
+}
+void AMapManager::onMapSpawner(TArray<ALineSpawner*> spawnerList)
+{
+	if (spawnerList.Num() > 0)
+	{
+		for (ALineSpawner* temp : spawnerList)
+		{
+			temp->StartSpawn();
+		}
+	}
+}
+#pragma endregion
+//==========================================================================
 void AMapManager::AddSwitchMapType(AMapController* map)
 {
 	if (IsValid(waitingMapParentActor))

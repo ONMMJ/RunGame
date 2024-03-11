@@ -26,6 +26,11 @@ void AExpObject::SetActive(bool isActive)
 	SetActorHiddenInGame(!isActive);
 }
 
+void AExpObject::DestorySelf()
+{
+	Destroy();
+}
+
 void AExpObject::TrackingPlayer(AActor* actor)
 {
 	target = actor;
