@@ -31,7 +31,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void SetActive(bool isActive);
 	void DestorySelf();
 	void TrackingPlayer(AActor* actor);
 

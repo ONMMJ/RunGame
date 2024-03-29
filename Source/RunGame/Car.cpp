@@ -165,6 +165,6 @@ void ACar::CheckTrafficLight()
 
 void ACar::CarDestroy()
 {
-	Destroy();
+	SetActive(false);
 }
 

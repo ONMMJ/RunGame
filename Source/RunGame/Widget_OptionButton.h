@@ -61,7 +61,6 @@ class RUNGAME_API UWidget_OptionButton : public UUserWidget
 		void Option_SetMagnet(float value);
 
 	private:
-
 		void SetOptionList();
 		void SetOptionFuncMap();
 		int SumPersentCount();

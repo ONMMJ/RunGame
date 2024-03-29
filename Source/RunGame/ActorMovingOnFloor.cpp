@@ -15,8 +15,24 @@ AActorMovingOnFloor::AActorMovingOnFloor()
 // Called when the game starts or when spawned
 void AActorMovingOnFloor::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
+}
+
+void AActorMovingOnFloor::SetActive(bool isActive)
+{
+	Super::SetActive(isActive);
+	if (isActive)
+	{
+		AttachFloor();
+	}
+	else
+	{
+		DetachFloor();
+	}
+}
+
+void AActorMovingOnFloor::AttachFloor()
+{
 	TArray<FHitResult> hits;
 	FVector start = GetActorLocation();
 	FVector direction = GetActorUpVector() * -1;
@@ -44,6 +60,11 @@ void AActorMovingOnFloor::BeginPlay()
 			}
 		}
 	}
+}
+
+void AActorMovingOnFloor::DetachFloor()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
 

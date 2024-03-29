@@ -10,7 +10,6 @@
 #include "Components/SphereComponent.h"
 #include "Widget_OptionButton.h"
 #include "ExpObject.h"
-#include "MapManager.h"
 #include <Kismet/GameplayStatics.h>
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -62,12 +61,6 @@ void AMyPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	GameStart();
-
-	// Get MapManager
-	TArray<AActor*> arrOutActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMapManager::StaticClass(), arrOutActors);
-	if (IsValid(arrOutActors[0]))
-		mapManager = Cast<AMapManager>(arrOutActors[0]);
 
 	// find out which way is forward
 	const FRotator Rotation = Controller->GetControlRotation();
@@ -141,10 +134,10 @@ void AMyPlayer::Tick(float DeltaTime)
 				float turnAngle;
 				if (speed > 599.f)
 					turnAngle = 30.f;
-				else if (speed > 20.f)
+				else if (speed > 100.f)
 					turnAngle = speed / 600.f * 30.f;
 				else
-					turnAngle = 10.f;
+					turnAngle = 5.f;
 
 				YMoveDirection.Yaw = YMoveDirection.Yaw + (turnAngle * moveNegative);
 			}
@@ -191,7 +184,7 @@ void AMyPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 		if (IsValid(expObject)) 
 		{
 			GetExp(expObject->exp);
-			expObject->DestorySelf();
+			expObject->SetActive(false);
 		}
 	}
 }
@@ -241,7 +234,7 @@ void AMyPlayer::Init()
 {
 	// Stat
 	magnetLevel = 0;
-	firstSpeed = 400.f;
+	firstSpeed = 450.f;
 	maxHp = 100.f;
 	hpDownPerSecond = 1.f;
 	expUpPerSecond = 1.f;
@@ -286,6 +279,12 @@ void AMyPlayer::GameStart()
 	//buffOptionCount = 3;
 }
 
+void AMyPlayer::SetSpeed(float mapSpeed)
+{
+	speed = mapSpeed * 30.f;
+	GetCharacterMovement()->MaxWalkSpeed = speed;
+}
+
 void AMyPlayer::GetExp(float exp)
 {
 	nowExp += exp;
@@ -311,21 +310,11 @@ float AMyPlayer::GetNextExp()
 	return 30.f + ((level - 1) * 10.f);
 }
 
-void AMyPlayer::SetMapSpeedBuff(float speedBuff)
-{
-	mapManager->SetMapSpeedBuff(speedBuff);
-}
-
 void AMyPlayer::AddBonusExp(float value)
 {
 	bonusExp += value;
 }
 
-void AMyPlayer::SetSpeed(float value)
-{
-	speed = value;
-	GetCharacterMovement()->MaxWalkSpeed = speed;
-}
 
 void AMyPlayer::SubHpDownBuff(float value)
 {
@@ -356,7 +345,7 @@ void AMyPlayer::SetMagnet(float value)
 	UE_LOG(LogTemp, Warning, TEXT("magnetLevel: %d, addValue: %f"), magnetLevel, value);
 }
 
-void AMyPlayer::GetDamaged(float damage)
+void AMyPlayer::GetDamaged_Implementation(float damage)
 {
 	if (isDamaged)
 		return;
@@ -364,15 +353,21 @@ void AMyPlayer::GetDamaged(float damage)
 	FTimerHandle timeHandle;
 
 	isDamaged = true;
-	mapManager->SetPlayerDamaged(true);
-	GetCharacterMovement()->MaxWalkSpeed = speed * mapManager->playerDamagedSpeed;
 	GetWorldTimerManager().SetTimer(timeHandle, this, &AMyPlayer::DamagedNext, damagedTime, false);
+
+	//OnNoticePlayerDamagedStart();
+
+
+	//mapManager->SetPlayerDamaged(true);
+	//GetCharacterMovement()->MaxWalkSpeed = speed * mapManager->playerDamagedSpeed;
 }
 
-void AMyPlayer::DamagedNext()
+void AMyPlayer::DamagedNext_Implementation()
 {
 	isDamaged = false;
-	GetCharacterMovement()->MaxWalkSpeed = speed;
-	mapManager->SetPlayerDamaged(false);
+
+	//OnNoticePlayerDamagedEnd();
+	//GetCharacterMovement()->MaxWalkSpeed = speed;
+	//mapManager->SetPlayerDamaged(false);
 
 }

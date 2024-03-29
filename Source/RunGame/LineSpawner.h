@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Spawner.h"
 #include "LineSpawner.generated.h"
 
 UCLASS()
-class RUNGAME_API ALineSpawner : public AActor
+class RUNGAME_API ALineSpawner : public ASpawner
 {
 	GENERATED_BODY()
 	
@@ -24,8 +24,6 @@ class RUNGAME_API ALineSpawner : public AActor
 	float nowZMoveTurnTime;
 	UPROPERTY()
 	float nextZMoveTurnTime;
-	UPROPERTY()
-	FTimerHandle timerHandle;
 public:	
 	// Sets default values for this actor's properties
 	ALineSpawner();
@@ -37,17 +35,10 @@ public:
 	AActor* end;	
 
 	UPROPERTY(EditAnywhere, category = "SpawnPosition")
-	AActor* move;
+	AActor* spawnPoint;
 
-
-	UPROPERTY(EditAnywhere, category = "SpawnInfo")
-	TSubclassOf<AActor> spawnActor; 
-	UPROPERTY(EditAnywhere, category = "SpawnInfo")
-	float spawnTime;
-	UPROPERTY(EditAnywhere, category = "SpawnInfo")
-	bool isLinked;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
-	float linkMoveSpeed;
+	float spawnPointSpeed;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
 	float YMoveTurnMinTime;
 	UPROPERTY(EditAnywhere, category = "SpawnLinkedOption")
@@ -66,9 +57,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void RandomSpawn();
-	void LinkedSpawn();
-
-	void StartSpawn();
-	void PauseSpawn();
+	virtual void Spawn() override;
 };

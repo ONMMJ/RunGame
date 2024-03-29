@@ -21,10 +21,6 @@ void AExpObject::BeginPlay()
 	Super::BeginPlay();
 	isTargetting = false;
 }
-void AExpObject::SetActive(bool isActive)
-{
-	SetActorHiddenInGame(!isActive);
-}
 
 void AExpObject::DestorySelf()
 {
@@ -34,7 +30,7 @@ void AExpObject::DestorySelf()
 void AExpObject::TrackingPlayer(AActor* actor)
 {
 	target = actor;
-	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	DetachFloor();
 	isTargetting = true;
 }
 

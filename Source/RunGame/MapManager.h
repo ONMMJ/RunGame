@@ -7,7 +7,7 @@
 #include "MapManager.generated.h"
 
 class AMapController;
-class ALineSpawner;
+class ASpawner;
 
 USTRUCT()
 struct FMapWaitingList
@@ -57,9 +57,6 @@ public:
 	// Sets default values for this actor's properties
 	AMapManager();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class AMyPlayer* player;
-
 	UPROPERTY(VisibleAnyWhere)
 	EMapType nextMapType;
 	UPROPERTY(VisibleAnyWhere)
@@ -106,11 +103,11 @@ public:
 
 	// map Spawner
 	UPROPERTY(VisibleAnywhere, Category = "MapSpawner")
-	TArray<ALineSpawner*> allSpawnerList;
+	TArray<ASpawner*> allSpawnerList;
 	UPROPERTY(EditAnywhere, Category = "MapSpawner")
-	TArray<ALineSpawner*> normalSpawnerList;
+	TArray<ASpawner*> normalSpawnerList;
 	UPROPERTY(EditAnywhere, Category = "MapSpawner")
-	TArray<ALineSpawner*> snowSpawnerList;
+	TArray<ASpawner*> snowSpawnerList;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -118,6 +115,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// BindFunction
+	void ChangedMapType(AMapController* mapController);
 
 	// map Effect
 	void setMapEffect(EMapType mapType);
@@ -127,9 +127,9 @@ public:
 
 	// map Spawner
 	void setMapSpawner(EMapType mapType);
-	void AddSpawnerList(TArray<ALineSpawner*> addList);
+	void AddSpawnerList(TArray<ASpawner*> addList);
 	void allOffMapSpawner();
-	void onMapSpawner(TArray<ALineSpawner*> spawnerList);
+	void onMapSpawner(TArray<ASpawner*> spawnerList);
 
 	void AddSwitchMapType(AMapController* map);
 
@@ -138,9 +138,13 @@ public:
 	void AddSpeed(float add);
 	void AddSpeedBuff(float buff);
 	void SetMapSpeedBuff(float buff);
-	void RemoveSpeedBuff(float buff);
+
+
+	UFUNCTION(BlueprintCallable)
 	void SetPlayerDamaged(bool isDamaged);
-	void SetPlayerSpeed();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CalTotalSpeed();
 
 	void SetNextMapType();
 

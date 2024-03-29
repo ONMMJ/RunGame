@@ -8,6 +8,8 @@
 
 class AExpObject;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FMapTypeStart, AMapController*);
+
 UENUM(BlueprintType)
 enum class EMapType : uint8
 {
@@ -37,9 +39,6 @@ public:
 	// Sets default values for this actor's properties
 	AMapController();
 
-	// MapManager
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MapInfo")
-	class AMapManager* mapManager;
 	// MapInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MapInfo")
 	EMapType mapType;
@@ -55,6 +54,8 @@ protected:
 public:	
 	UFUNCTION()
 	void OnOverlapBeginPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	FMapTypeStart ChangedMapType;
 
 	void SetActive(bool isActive);
 };

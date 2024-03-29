@@ -134,22 +134,25 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override; 
+	
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void SetMapSpeedBuff(float speedBuff);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GetDamaged(float damage);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void DamagedNext();
+
+	UFUNCTION(BlueprintCallable)
+	void SetSpeed(float mapSpeed);
 
 	// LevelUp Option
 	void AddBonusExp(float value);
-	void SetSpeed(float value);
 	void SubHpDownBuff(float value);
 	void AddMaxHp(float value);
 	void SetMagnet(float value);

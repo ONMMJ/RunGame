@@ -2,9 +2,6 @@
 
 
 #include "MapController.h"
-#include "ExpObject.h"
-#include "MyPlayer.h"
-#include "MapManager.h"
 #include <Components/BoxComponent.h>
 
 // Sets default values
@@ -39,16 +36,10 @@ void AMapController::BeginPlay()
 
 void AMapController::OnOverlapBeginPlayer(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AMyPlayer* player = Cast<AMyPlayer>(OtherActor);
-	if (player)
+	if (OtherActor->ActorHasTag("Player"))
 	{
-		player->SetMapSpeedBuff(speedBuff);
-
-		if (mapLoopType == EMapLoopType::MLT_Start)
-		{
-			mapManager->setMapEffect(mapType);
-			mapManager->setMapSpawner(mapType);
-		}
+		if (ChangedMapType.IsBound())
+			ChangedMapType.Broadcast(this);
 	}
 }
 

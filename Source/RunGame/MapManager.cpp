@@ -3,8 +3,7 @@
 
 #include "MapManager.h"
 #include "MapController.h"
-#include "MyPlayer.h"
-#include "LineSpawner.h"
+#include "Spawner.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -28,8 +27,6 @@ void AMapManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Get Player
-	player = Cast<AMyPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	nextMapType = EMapType::MT_Normal;
 	nextMapLoopType = EMapLoopType::MLT_Loop;
@@ -50,7 +47,7 @@ void AMapManager::BeginPlay()
 			if (IsValid(map))
 			{
 				AddSwitchMapType(map);
-				map->mapManager = this;
+				map->ChangedMapType.AddUObject(this, &AMapManager::ChangedMapType);
 			}
 		}
 	}
@@ -79,6 +76,8 @@ void AMapManager::BeginPlay()
 	AddSpawnerList(normalSpawnerList);
 	AddSpawnerList(snowSpawnerList);
 	setMapSpawner(nextMapType);
+
+	CalTotalSpeed();
 }
 
 
@@ -113,7 +112,7 @@ void AMapManager::Tick(float DeltaTime)
 		}
 	}
 
-	totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
+	float constTotalSpeed = totalSpeed;
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -121,9 +120,22 @@ void AMapManager::Tick(float DeltaTime)
 			return;
 
 		FVector location = moveActorList[i].parent->GetActorLocation();
-		location += direction * totalSpeed * 100.f * DeltaTime;
+		location += direction * constTotalSpeed * 100.f * DeltaTime;
 
 		moveActorList[i].parent->SetActorLocation(location);
+	}
+}
+void AMapManager::ChangedMapType(AMapController* mapController)
+{
+	float mapSpeedB = mapController->speedBuff;
+	EMapType mapType = mapController->mapType;
+	EMapLoopType mapLoopType = mapController->mapLoopType;
+
+	SetMapSpeedBuff(mapSpeedB);
+	if (mapLoopType == EMapLoopType::MLT_Start)
+	{
+		setMapEffect(mapType);
+		setMapSpawner(mapType);
 	}
 }
 //==========================================================================
@@ -196,11 +208,11 @@ void AMapManager::setMapSpawner(EMapType mapType)
 		break;
 	}
 }
-void AMapManager::AddSpawnerList(TArray<ALineSpawner*> addList)
+void AMapManager::AddSpawnerList(TArray<ASpawner*> addList)
 {
 	if (addList.Num() > 0)
 	{
-		for (ALineSpawner* temp : addList)
+		for (ASpawner* temp : addList)
 		{
 			allSpawnerList.Add(temp);
 		}
@@ -210,17 +222,17 @@ void AMapManager::allOffMapSpawner()
 {
 	if (allSpawnerList.Num() > 0)
 	{
-		for (ALineSpawner* temp : allSpawnerList)
+		for (ASpawner* temp : allSpawnerList)
 		{
 			temp->PauseSpawn();
 		}
 	}
 }
-void AMapManager::onMapSpawner(TArray<ALineSpawner*> spawnerList)
+void AMapManager::onMapSpawner(TArray<ASpawner*> spawnerList)
 {
 	if (spawnerList.Num() > 0)
 	{
-		for (ALineSpawner* temp : spawnerList)
+		for (ASpawner* temp : spawnerList)
 		{
 			temp->StartSpawn();
 		}
@@ -269,44 +281,36 @@ void AMapManager::AddSwitchMapType(AMapController* map)
 void AMapManager::SetSpeed(float inputSpeed)
 {
 	speed = inputSpeed;
-	SetPlayerSpeed();
+	CalTotalSpeed();
 }
 
 void AMapManager::AddSpeed(float add)
 {
 	speed += add;
-	SetPlayerSpeed();
+	CalTotalSpeed();
 }
 
 void AMapManager::AddSpeedBuff(float buff)
 {
 	speedBuff *= buff;
-	SetPlayerSpeed();
+	CalTotalSpeed();
 }
 
 void AMapManager::SetMapSpeedBuff(float buff)
 {
 	mapSpeedBuff = buff;
-	SetPlayerSpeed();
-}
-
-void AMapManager::RemoveSpeedBuff(float buff)
-{
-	speedBuff /= buff; 
-	SetPlayerSpeed();
+	CalTotalSpeed();
 }
 
 void AMapManager::SetPlayerDamaged(bool isDamaged)
 {
 	isPlayerDamaged = isDamaged;
-	SetPlayerSpeed();
+	CalTotalSpeed();
 }
 
-void AMapManager::SetPlayerSpeed()
+void AMapManager::CalTotalSpeed_Implementation()
 {
 	totalSpeed = speed * mapSpeedBuff * speedBuff * (isPlayerDamaged ? playerDamagedSpeed : 1.f);
-	float playerSpeed = totalSpeed * 50.f;
-	player->SetSpeed(playerSpeed);
 }
 
 void AMapManager::SetNextMapType()
@@ -322,7 +326,8 @@ void AMapManager::SetNextMapType()
 	default:
 		break;
 	}
-	//SetActorHiddenInGame(!isActive);
+
+	allOffMapSpawner();
 }
 
 AMapController* AMapManager::GetMap(EMapType mapType, EMapLoopType mapLoopType)
