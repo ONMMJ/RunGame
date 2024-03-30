@@ -41,6 +41,9 @@ public:
 	UFUNCTION()
 	virtual void Spawn() PURE_VIRTUAL(ASpawner::Spawn, );
 
+
+	UFUNCTION(BlueprintCallable)
+	void SetSpawn();
 	void StartSpawn();
 	void PauseSpawn();
 	AObjectPoolActor* GetObjectFromPool(FVector spawnPosition, FRotator spawnRotator);

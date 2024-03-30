@@ -17,6 +17,9 @@ class RUNGAME_API ACar : public AActorMovingOnFloor
 
 	UPROPERTY(VisibleAnyWhere)
 	class ATrafficLight* trafficLight;
+
+	// 일정 시간 이후 비활성화 타이머
+	FTimerHandle timerHandle;
 public:
 	// Sets default values for this actor's properties
 	ACar();
@@ -59,6 +62,8 @@ public:
 
 	UFUNCTION()
 	void OnOverlapEndFrontCar(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	virtual void SetActive(bool isActive) override;
 
 	void CheckTrafficLight();
 	void CarDestroy();

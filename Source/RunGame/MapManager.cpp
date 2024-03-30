@@ -214,6 +214,7 @@ void AMapManager::AddSpawnerList(TArray<ASpawner*> addList)
 	{
 		for (ASpawner* temp : addList)
 		{
+			temp->SetSpawn();
 			allSpawnerList.Add(temp);
 		}
 	}

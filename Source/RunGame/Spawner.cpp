@@ -15,7 +15,18 @@ void ASpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(timerHandle, this, &ASpawner::Spawn, spawnTime, true);	
+}
+
+// Called every frame
+void ASpawner::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void ASpawner::SetSpawn()
+{
+    GetWorldTimerManager().SetTimer(timerHandle, this, &ASpawner::Spawn, spawnTime, true);
 
     for (int32 i = 0; i < poolSize; i++)
     {
@@ -26,13 +37,6 @@ void ASpawner::BeginPlay()
             objectPool.Add(spawnObject);
         }
     }
-}
-
-// Called every frame
-void ASpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ASpawner::StartSpawn()

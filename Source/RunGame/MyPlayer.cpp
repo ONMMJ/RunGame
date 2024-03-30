@@ -9,7 +9,8 @@
 #include <EnhancedInputComponent.h>
 #include "Components/SphereComponent.h"
 #include "Widget_OptionButton.h"
-#include "ExpObject.h"
+#include "EatableItem.h"
+#include "MagnetableInterface.h"
 #include <Kismet/GameplayStatics.h>
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -45,8 +46,7 @@ AMyPlayer::AMyPlayer()
 	magnetCollision = CreateDefaultSubobject<USphereComponent>(TEXT("MagnetCollision"));
 	magnetCollision->SetCollisionProfileName(TEXT("Magnet"));
 	magnetCollision->SetupAttachment(GetCapsuleComponent());
-	magnetCollision->SetGenerateOverlapEvents(false);
-	magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
+	magnetCollision->SetGenerateOverlapEvents(true);
 
 	// 위아래로 이동하지 않을 때 정면을 바라보는 시간
 	rotationTime = 0.5f;
@@ -61,6 +61,8 @@ void AMyPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	GameStart();
+	magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
+
 
 	// find out which way is forward
 	const FRotator Rotation = Controller->GetControlRotation();
@@ -178,26 +180,19 @@ void AMyPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AMyPlayer::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && (OtherActor != this) && OtherComp)
+	if (OtherActor->GetClass()->ImplementsInterface(UEatableItem::StaticClass()))
 	{
-		AExpObject* expObject = Cast<AExpObject>(OtherActor);
-		if (IsValid(expObject)) 
-		{
-			GetExp(expObject->exp);
-			expObject->SetActive(false);
-		}
+		IEatableItem::Execute_ActiveItem(OtherActor, this);
 	}
 }
 
 void AMyPlayer::OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && (OtherActor != this) && OtherComp)
+	if (!isMagnet)
+		return;
+	if (OtherActor->GetClass()->ImplementsInterface(UMagnetableInterface::StaticClass()))
 	{
-		AExpObject* expObject = Cast<AExpObject>(OtherActor);
-		if (IsValid(expObject))
-		{
-			expObject->TrackingPlayer(this);
-		}
+		IMagnetableInterface::Execute_Targetting(OtherActor, this);
 	}
 }
 
@@ -261,7 +256,7 @@ void AMyPlayer::GameStart()
 	speed = firstSpeed;
 	isMoveFront = true;
 	isMove = true;
-	magnetCollision->SetGenerateOverlapEvents(false);	// 자석 off
+	isMagnet = false;
 
 	// 기본 세팅
 	magnetLevel = 0;
@@ -338,8 +333,7 @@ void AMyPlayer::SetMagnet(float value)
 	}
 	else 
 	{
-		magnetCollision->SetGenerateOverlapEvents(true);
-		magnetCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyPlayer::OnOverlapBeginMagnet);
+		isMagnet = true;
 	}
 	magnetLevel += value;
 	UE_LOG(LogTemp, Warning, TEXT("magnetLevel: %d, addValue: %f"), magnetLevel, value);

@@ -40,9 +40,6 @@ void ACar::BeginPlay()
 
 	int index = FMath::RandRange(0, 4);
 	mesh->SetSkeletalMesh(meshList[index]);
-
-	FTimerHandle timerHandle;
-	GetWorldTimerManager().SetTimer(timerHandle, this, &ACar::CarDestroy, destroyTime, false);
 }
 
 // Called every frame
@@ -139,6 +136,19 @@ void ACar::OnOverlapEndFrontCar(UPrimitiveComponent* OverlappedComp, AActor* Oth
 				// 타이머 초기화
 				GetWorld()->GetTimerManager().ClearTimer(myTimerHandle);
 			}), delayTime, false); // 반복 실행을 하고 싶으면 false 대신 true 대입
+	}
+}
+
+void ACar::SetActive(bool isActive)
+{
+	Super::SetActive(isActive);
+	if (isActive)
+	{
+		GetWorldTimerManager().SetTimer(timerHandle, this, &ACar::CarDestroy, destroyTime, false);
+	}
+	else
+	{
+		GetWorldTimerManager().ClearTimer(timerHandle);
 	}
 }
 

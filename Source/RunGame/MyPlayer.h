@@ -57,6 +57,9 @@ class RUNGAME_API AMyPlayer : public ACharacter
 	float speed;
 	UPROPERTY()
 	float bonusExp;
+	UPROPERTY()
+	bool isMagnet;
+
 public:
 	// Sets default values for this character's properties
 	AMyPlayer();
@@ -125,7 +128,6 @@ protected:
 	void EndMove(const FInputActionValue& Value);
 	void Init();
 	void GameStart();
-	void GetExp(float exp);
 	void LevelUp();
 	float GetNextExp();
 
@@ -150,6 +152,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetSpeed(float mapSpeed);
+
+	void GetExp(float exp);
 
 	// LevelUp Option
 	void AddBonusExp(float value);

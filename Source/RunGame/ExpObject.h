@@ -3,16 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ActorMovingOnFloor.h"
+#include "MagnetableItem.h"
+#include "EatableItem.h"
 #include "ExpObject.generated.h"
 
 UCLASS()
-class RUNGAME_API AExpObject : public AActorMovingOnFloor
+class RUNGAME_API AExpObject : public AMagnetableItem, public IEatableItem
 {
 	GENERATED_BODY()
 	
-	UPROPERTY()
-	bool isTargetting;
 public:	
 	// Sets default values for this actor's properties
 	AExpObject();
@@ -21,19 +20,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float exp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TargetInfo")
-	AActor* target;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "TargetInfo")
-	float moveSpeed;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	void DestorySelf();
-	void TrackingPlayer(AActor* actor);
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// IEatableItem을(를) 통해 상속됨
+	virtual void ActiveItem_Implementation(AMyPlayer* player) override;
 };

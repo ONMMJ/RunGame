@@ -22,30 +22,19 @@ void AExpObject::BeginPlay()
 	isTargetting = false;
 }
 
-void AExpObject::DestorySelf()
-{
-	Destroy();
-}
-
-void AExpObject::TrackingPlayer(AActor* actor)
-{
-	target = actor;
-	DetachFloor();
-	isTargetting = true;
-}
-
 void AExpObject::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-	
-	if (!isTargetting)
-		return;
+	Super::Tick(DeltaTime);	
+}
 
-	FVector direction = target->GetActorLocation() - GetActorLocation();
-	direction.Normalize();
-
-	FVector location = GetActorLocation() + (direction * moveSpeed * DeltaTime);
-	SetActorLocation(location);
+void AExpObject::ActiveItem_Implementation(AMyPlayer* player)
+{
+	if (IsValid(player))
+	{
+		player->GetExp(exp);
+		isTargetting = false;
+		SetActive(false);
+	}
 }
 
 
