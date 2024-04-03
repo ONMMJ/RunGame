@@ -7,6 +7,8 @@
 #include "EatableItem.h"
 #include "ExpObject.generated.h"
 
+class UNiagaraComponent;
+
 UCLASS()
 class RUNGAME_API AExpObject : public AMagnetableItem, public IEatableItem
 {
@@ -15,10 +17,18 @@ class RUNGAME_API AExpObject : public AMagnetableItem, public IEatableItem
 public:	
 	// Sets default values for this actor's properties
 	AExpObject();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMeshComponent* staticMesh;
+	class UBoxComponent* boxCollider;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float exp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UNiagaraComponent* NS_idle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UNiagaraComponent* NS_eat;
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,4 +40,9 @@ public:
 
 	// IEatableItem을(를) 통해 상속됨
 	virtual void ActiveItem_Implementation(AMyPlayer* player) override;
+
+	virtual void SetActive(bool isActive) override;
+
+	UFUNCTION(BlueprintCallable)
+	void NS_eatFinished();
 };
