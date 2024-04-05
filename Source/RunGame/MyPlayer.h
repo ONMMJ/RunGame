@@ -93,8 +93,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status")
 	float firstSpeed;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
-	float runningDistance;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
 	int level;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
 	float nowExp;
@@ -143,6 +141,9 @@ public:
 
 	UFUNCTION()
 	void OnOverlapBeginMagnet(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void GameOver();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GetDamaged(float damage);

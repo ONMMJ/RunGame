@@ -151,8 +151,11 @@ void AMyPlayer::Tick(float DeltaTime)
 	}
 
 	if (hp > 0) {
-		runningDistance = GetActorLocation().X - startPos.X;
 		hp -= hpDownPerSecond * hpDownBuff * DeltaTime;
+	}
+	else
+	{
+		GameOver();
 	}
 }
 
@@ -233,7 +236,6 @@ void AMyPlayer::Init()
 	maxHp = 100.f;
 	hpDownPerSecond = 1.f;
 	expUpPerSecond = 1.f;
-	runningDistance = 0.f;
 	level = 1;
 	bonusExp = 0.f;
 	nowExp = 0.f;
@@ -262,7 +264,6 @@ void AMyPlayer::GameStart()
 	magnetLevel = 0;
 	hpDownPerSecond = 1.f;
 	expUpPerSecond = 1.f;
-	runningDistance = 0.f;
 	level = 1;
 	nowExp = 0.f;
 	nextExp = 30.f;
@@ -296,6 +297,17 @@ void AMyPlayer::LevelUp()
 	level++;
 	isMoveFront = true;
 	optionButtonWidget->PlayerLevelUp();
+}
+
+void AMyPlayer::GameOver_Implementation()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!ensure(PlayerController != nullptr)) return;
+
+	//마우스커서 보이게하기
+	PlayerController->bShowMouseCursor = true;
 }
 
 
