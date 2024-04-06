@@ -54,8 +54,6 @@ class RUNGAME_API AMyPlayer : public ACharacter
 	UPROPERTY()
 	double moveNegative;
 	UPROPERTY()
-	float speed;
-	UPROPERTY()
 	float bonusExp;
 	UPROPERTY()
 	bool isMagnet;
@@ -81,6 +79,7 @@ public:
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly)
 	bool isDamaged;
 
+
 	// Status
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status")
 	float hp;
@@ -100,6 +99,10 @@ public:
 	float nextExp;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Status")
 	float damagedTime;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status")
+	float speed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Status")
+	float shieldCount;
 
 
 	// Buff
@@ -151,6 +154,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void DamagedNext();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetShield();
+
 	UFUNCTION(BlueprintCallable)
 	void SetSpeed(float mapSpeed);
 
@@ -161,4 +167,5 @@ public:
 	void SubHpDownBuff(float value);
 	void AddMaxHp(float value);
 	void SetMagnet(float value);
+	void AddShieldCount(float value);
 };

@@ -76,6 +76,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, blueprintReadOnly, Category = "MoveInfo")
 	float totalSpeed;
+	UPROPERTY(VisibleAnywhere, blueprintReadOnly, Category = "MoveInfo")
+	bool isStart;
 
 
 
@@ -108,6 +110,7 @@ public:
 	TArray<ASpawner*> normalSpawnerList;
 	UPROPERTY(EditAnywhere, Category = "MapSpawner")
 	TArray<ASpawner*> snowSpawnerList;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -142,6 +145,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerDamaged(bool isDamaged);
+	UFUNCTION(BlueprintCallable)
+	void Gameover();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CalTotalSpeed();

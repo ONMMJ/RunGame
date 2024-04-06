@@ -241,6 +241,7 @@ void AMyPlayer::Init()
 	nowExp = 0.f;
 	nextExp = 30.f;
 	damagedTime = 3.f;
+	shieldCount = 0;
 
 	hpDownBuff = 1.f;
 	expUpBuff = 1.f;
@@ -267,6 +268,7 @@ void AMyPlayer::GameStart()
 	level = 1;
 	nowExp = 0.f;
 	nextExp = 30.f;
+	shieldCount = 0;
 
 	hpDownBuff = 1.f;
 	expUpBuff = 1.f;
@@ -301,7 +303,7 @@ void AMyPlayer::LevelUp()
 
 void AMyPlayer::GameOver_Implementation()
 {
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
+	//UGameplayStatics::SetGamePaused(GetWorld(), true);
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (!ensure(PlayerController != nullptr)) return;
@@ -351,21 +353,29 @@ void AMyPlayer::SetMagnet(float value)
 	UE_LOG(LogTemp, Warning, TEXT("magnetLevel: %d, addValue: %f"), magnetLevel, value);
 }
 
+void AMyPlayer::AddShieldCount(float value)
+{
+	shieldCount += (int)value;
+	UE_LOG(LogTemp, Warning, TEXT("addShield: %f"), shieldCount);
+	SetShield();
+}
+
 void AMyPlayer::GetDamaged_Implementation(float damage)
 {
 	if (isDamaged)
 		return;
-	hp -= damage;
-	FTimerHandle timeHandle;
 
 	isDamaged = true;
+	FTimerHandle timeHandle;
 	GetWorldTimerManager().SetTimer(timeHandle, this, &AMyPlayer::DamagedNext, damagedTime, false);
 
-	//OnNoticePlayerDamagedStart();
-
-
-	//mapManager->SetPlayerDamaged(true);
-	//GetCharacterMovement()->MaxWalkSpeed = speed * mapManager->playerDamagedSpeed;
+	if (shieldCount > 0)
+	{
+	}
+	else
+	{
+		hp -= damage;
+	}
 }
 
 void AMyPlayer::DamagedNext_Implementation()

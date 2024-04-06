@@ -208,7 +208,7 @@ void UWidget_OptionButton::Option_GrowUp(float value)
 
 void UWidget_OptionButton::Option_AddShield(float value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AddShield"));
+	player->AddShieldCount(value);
 }
 
 void UWidget_OptionButton::Option_SetMagnet(float value)

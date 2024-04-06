@@ -78,6 +78,7 @@ void AMapManager::BeginPlay()
 	setMapSpawner(nextMapType);
 
 	CalTotalSpeed();
+	isStart = true;
 }
 
 
@@ -86,6 +87,9 @@ void AMapManager::BeginPlay()
 void AMapManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!isStart)
+		return;
 
 	for (int i = 0; i < 3; i++) 
 	{
@@ -307,6 +311,11 @@ void AMapManager::SetPlayerDamaged(bool isDamaged)
 {
 	isPlayerDamaged = isDamaged;
 	CalTotalSpeed();
+}
+
+void AMapManager::Gameover()
+{
+	isStart = false;
 }
 
 void AMapManager::CalTotalSpeed_Implementation()
